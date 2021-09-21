@@ -92,8 +92,8 @@ import RestaurantLandingPage from "demos/RestaurantLandingPage.js";
 // import HostingCloudLandingPage from "demos/HostingCloudLandingPage.js";
 
 /* Inner Pages */
-// import LoginPage from "pages/Login.js";
-// import SignupPage from "pages/Signup.js";
+import LoginPage from "pages/Login.js";
+import SignupPage from "pages/Signup.js";
 // import PricingPage from "pages/Pricing.js";
 // import AboutUsPage from "pages/AboutUs.js";
 // import ContactUsPage from "pages/ContactUs.js";
@@ -114,9 +114,14 @@ export default function App() {
   return (
     <Router>
       <Switch>
-        <Route path="/*">
-          <RestaurantLandingPage />
+        <Route path='/login'>
+          <LoginPage />
         </Route>
+
+        <Route path='/register'>
+          <SignupPage />
+        </Route>
+
         <Route path="/components/:type/:subtype/:name">
           <ComponentRenderer />
         </Route>

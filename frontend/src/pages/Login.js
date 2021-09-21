@@ -1,13 +1,20 @@
 import React from "react";
-import AnimationRevealPage from "helpers/AnimationRevealPage.js";
+import tw, { css } from "twin.macro";
 import { Container as ContainerBase } from "components/misc/Layouts";
-import tw from "twin.macro";
+
+// imports
+import * as Yup from "yup";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+
+// styling
 import styled from "styled-components";
-import {css} from "styled-components/macro"; //eslint-disable-line
-import illustration from "images/login-illustration.svg";
+import AnimationRevealPage from "helpers/AnimationRevealPage.js";
+
+// icons
 import logo from "images/logo.svg";
 import googleIconImageSrc from "images/google-icon.png";
 import twitterIconImageSrc from "images/twitter-icon.png";
+import illustration from "images/login-illustration.svg";
 import { ReactComponent as LoginIcon } from "feather-icons/dist/icons/log-in.svg";
 
 const Container = tw(ContainerBase)`min-h-screen bg-primary-900 text-white font-medium flex justify-center -m-8`;
@@ -36,7 +43,7 @@ const SocialButton = styled.a`
 const DividerTextContainer = tw.div`my-12 border-b text-center relative`;
 const DividerText = tw.div`leading-none px-2 inline-block text-sm text-gray-600 tracking-wide font-medium bg-white transform -translate-y-1/2 absolute inset-x-0 top-1/2 bg-transparent`;
 
-const Form = tw.form`mx-auto max-w-xs`;
+// const Form = tw.form`mx-auto max-w-xs`;
 const Input = tw.input`w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5 first:mt-0`;
 const SubmitButton = styled.button`
   ${tw`mt-5 tracking-wide font-semibold bg-primary-500 text-gray-100 w-full py-4 rounded-lg hover:bg-primary-900 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none`}
@@ -52,6 +59,15 @@ const IllustrationImage = styled.div`
   ${props => `background-image: url("${props.imageSrc}");`}
   ${tw`m-12 xl:m-16 w-full max-w-sm bg-contain bg-center bg-no-repeat`}
 `;
+
+const LoginSchema = Yup.object().shape({
+  email: Yup.string()
+    .email("Invalid email address format")
+    .required("Email is required"),
+  password: Yup.string()
+    .min(3, "Password must be 3 characters at minimum")
+    .required("Password is required"),
+});
 
 export default ({
   logoLinkUrl = "#",
@@ -85,11 +101,11 @@ export default ({
           <MainContent>
             <Heading>{headingText}</Heading>
             <FormContainer>
-              <SocialButtonsContainer>
+              <SocialButtonsContainer css={[tw.form`mx-auto max-w-xs`]}>
                 {socialButtons.map((socialButton, index) => (
                   <SocialButton key={index} href={socialButton.url}>
                     <span className="iconContainer">
-                      <img src={socialButton.iconImageSrc} className="icon" alt=""/>
+                      <img src={socialButton.iconImageSrc} className="icon" alt="" />
                     </span>
                     <span className="text">{socialButton.text}</span>
                   </SocialButton>
@@ -98,14 +114,69 @@ export default ({
               <DividerTextContainer>
                 <DividerText>Or Sign in with your e-mail</DividerText>
               </DividerTextContainer>
-              <Form>
-                <Input type="email" placeholder="Email" />
-                <Input type="password" placeholder="Password" />
-                <SubmitButton type="submit">
-                  <SubmitButtonIcon className="icon" />
-                  <span className="text">{submitButtonText}</span>
-                </SubmitButton>
-              </Form>
+              <Formik
+                initialValues={{ email: "", password: "" }}
+                validationSchema={LoginSchema}
+                onSubmit={(values) => {
+                  console.log(values);
+                  alert("Form is validated! Submitting the form...");
+                }}
+              >
+                {
+                  ({ touched, errors, isSubmitting, values }) =>
+                    !isSubmitting ? (
+                      <div>
+                        <Form css={[tw`mx-auto max-w-xs`]} >
+                          {/* <Input type="email" placeholder="Email" />
+                          <Input type="password" placeholder="Password" /> */}
+
+                          <div className="form-group" style={{ marginTop: "1.25rem" }}>
+                            <Field
+                              type="email"
+                              name="email"
+                              placeholder="Enter email"
+                              autocomplete="off"
+                              css={[tw`w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5 first:mt-0`]}
+                              className={`mt-2 form-control ${touched.email && errors.email ? "is-invalid" : ""}`}
+                            />
+                            <ErrorMessage
+                              component="div"
+                              name="email"
+                              className="invalid-feedback"
+                            />
+                          </div>
+
+                          <div className="form-group" style={{ marginTop: "1.25rem" }}>
+                            <Field
+                              type="password"
+                              name="password"
+                              placeholder="Enter password"
+                              autocomplete="off"
+                              css={[tw`w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5 first:mt-0`]}
+                              className={`mt-2 form-control ${touched.password && errors.password
+                                ? "is-invalid"
+                                : ""
+                                }`}
+                            />
+                            <ErrorMessage
+                              component="div"
+                              name="password"
+                              className="invalid-feedback"
+                            />
+                          </div>
+                          <SubmitButton type="submit">
+                            <SubmitButtonIcon className="icon" />
+                            <span className="text">{submitButtonText}</span>
+                          </SubmitButton>
+                        </Form>
+                      </div>
+                    ) : (
+                      <div>
+
+                      </div>
+                    )
+                }
+              </Formik>
               <p tw="mt-6 text-xs text-gray-600 text-center">
                 <a href={forgotPasswordUrl} tw="border-b border-gray-500 border-dotted">
                   Forgot Password ?
@@ -124,6 +195,6 @@ export default ({
           <IllustrationImage imageSrc={illustrationImageSrc} />
         </IllustrationContainer>
       </Content>
-    </Container>
-  </AnimationRevealPage>
+    </Container >
+  </AnimationRevealPage >
 );

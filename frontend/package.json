@@ -8,6 +8,7 @@
     "@testing-library/react": "^11.2.6",
     "@testing-library/user-event": "^13.1.5",
     "feather-icons": "^4.28.0",
+    "formik": "^2.2.9",
     "framer-motion": "^4.1.5",
     "react": "^17.0.2",
     "react-anchor-link-smooth-scroll": "^1.0.12",
@@ -21,7 +22,8 @@
     "slick-carousel": "^1.8.1",
     "styled-components": "^5.2.3",
     "tailwindcss": "^2.1.1",
-    "twin.macro": "^2.3.3"
+    "twin.macro": "^2.3.3",
+    "yup": "^0.32.9"
   },
   "scripts": {
     "start": "SET PORT=3004 && react-scripts start",
@@ -32,14 +34,16 @@
   },
   "eslintConfig": {
     "extends": "react-app",
-    "overrides": [{
-      "files": [
-        "src/**/*.js"
-      ],
-      "rules": {
-        "import/no-anonymous-default-export": "off"
+    "overrides": [
+      {
+        "files": [
+          "src/**/*.js"
+        ],
+        "rules": {
+          "import/no-anonymous-default-export": "off"
+        }
       }
-    }]
+    ]
   },
   "browserslist": {
     "production": [
