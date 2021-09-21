@@ -12,7 +12,7 @@ module.exports.authenticateUser = (email, callback) => {
             } else {
                 try {
                     let query =
-                        `SELECT 
+                                `SELECT 
                                     * 
                                 FROM 
                                     sp_shop.users 
@@ -25,9 +25,9 @@ module.exports.authenticateUser = (email, callback) => {
                             reject(err);
                         } else {
                             if (result.length == 1) {
-                                resolve(result[0]);
+                                resolve(result);
                             } else {
-                                reject(result[0]);
+                                reject(result);
                             }
                         }
                         connection.release();

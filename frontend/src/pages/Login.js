@@ -1,9 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import tw, { css } from "twin.macro";
 import { Container as ContainerBase } from "components/misc/Layouts";
 
 // imports
+import axios from "axios";
 import * as Yup from "yup";
+import config from "../Config.js";
+import { useHistory } from "react-router-dom";
+import ClipLoader from "react-spinners/ClipLoader";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 
 // styling
@@ -63,17 +67,24 @@ const IllustrationImage = styled.div`
 const LoginSchema = Yup.object().shape({
   email: Yup.string()
     .email("Invalid email address format")
-    .required("Email is required"),
+    .required("Please enter your email address!"),
   password: Yup.string()
     .min(3, "Password must be 3 characters at minimum")
-    .required("Password is required"),
+    .required("Please enter you password!"),
 });
 
-export default ({
-  logoLinkUrl = "#",
-  illustrationImageSrc = illustration,
-  headingText = "Sign In To Treact",
-  socialButtons = [
+const override = `
+  display: block;
+  margin: 0 auto;
+  border-color: red;
+`;
+
+export default function Login() {
+  // Pre Defined Variables
+  const logoLinkUrl = "#";
+  const illustrationImageSrc = illustration;
+  const headingText = "Sign In To Treact";
+  const socialButtons = [
     {
       iconImageSrc: googleIconImageSrc,
       text: "Sign In With Google",
@@ -84,117 +95,157 @@ export default ({
       text: "Sign In With Twitter",
       url: "https://twitter.com"
     }
-  ],
-  submitButtonText = "Sign In",
-  SubmitButtonIcon = LoginIcon,
-  forgotPasswordUrl = "#",
-  signupUrl = "#",
+  ];
+  const submitButtonText = "Sign In";
+  const SubmitButtonIcon = LoginIcon;
+  const forgotPasswordUrl = "#";
+  const signupUrl = "http://localhost:3004/register";
 
-}) => (
-  <AnimationRevealPage>
-    <Container>
-      <Content>
-        <MainContainer>
-          <LogoLink href={logoLinkUrl}>
-            <LogoImage src={logo} />
-          </LogoLink>
-          <MainContent>
-            <Heading>{headingText}</Heading>
-            <FormContainer>
-              <SocialButtonsContainer css={[tw.form`mx-auto max-w-xs`]}>
-                {socialButtons.map((socialButton, index) => (
-                  <SocialButton key={index} href={socialButton.url}>
-                    <span className="iconContainer">
-                      <img src={socialButton.iconImageSrc} className="icon" alt="" />
-                    </span>
-                    <span className="text">{socialButton.text}</span>
-                  </SocialButton>
-                ))}
-              </SocialButtonsContainer>
-              <DividerTextContainer>
-                <DividerText>Or Sign in with your e-mail</DividerText>
-              </DividerTextContainer>
-              <Formik
-                initialValues={{ email: "", password: "" }}
-                validationSchema={LoginSchema}
-                onSubmit={(values) => {
-                  console.log(values);
-                  alert("Form is validated! Submitting the form...");
-                }}
-              >
-                {
-                  ({ touched, errors, isSubmitting, values }) =>
-                    !isSubmitting ? (
-                      <div>
-                        <Form css={[tw`mx-auto max-w-xs`]} >
-                          {/* <Input type="email" placeholder="Email" />
+  // Team's Defined Variables
+  const history = useHistory();
+  let [color, setColor] = useState("#ffffff");
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const validateLogininformation = (values) => {
+    // Insert spinner into here in the future!
+    setIsSubmitted(true);
+
+    axios
+      .post(`${config.baseUrl}/u/user/signin`, {
+        email: values.email,
+        password: values.password,
+      })
+      .then((results) => {
+        localStorage.setItem('token', results.data.token);
+        localStorage.setItem('displayName', results.data.displayName);
+
+        history.push({
+          pathname: "/",
+        });
+      })
+      .catch((error) => {
+        if (error.response.data.description === "Invalid Credentials.") {
+          console.log("Please key in a your valid credentials")
+        }
+
+        if (error.response.data.description === "Internal error") {
+          console.log("Please contact an administrator for help!")
+        }
+      })
+      .finally(() => {
+        setIsSubmitted(false);
+      })
+  }
+
+  return (
+    <AnimationRevealPage>
+      <Container>
+        <Content>
+          <MainContainer>
+            <LogoLink href={logoLinkUrl}>
+              <LogoImage src={logo} />
+            </LogoLink>
+            <MainContent>
+              <Heading>{headingText}</Heading>
+              <FormContainer>
+                <SocialButtonsContainer css={[tw.form`mx-auto max-w-xs`]}>
+                  {socialButtons.map((socialButton, index) => (
+                    <SocialButton key={index} href={socialButton.url}>
+                      <span className="iconContainer">
+                        <img src={socialButton.iconImageSrc} className="icon" alt="" />
+                      </span>
+                      <span className="text">{socialButton.text}</span>
+                    </SocialButton>
+                  ))}
+                </SocialButtonsContainer>
+                <DividerTextContainer>
+                  <DividerText>Or Sign in with your e-mail</DividerText>
+                </DividerTextContainer>
+                <Formik
+                  initialValues={{ email: "", password: "" }}
+                  validationSchema={LoginSchema}
+                  onSubmit={(values) => {
+                    validateLogininformation(values);
+                  }}
+                >
+                  {
+                    ({ touched, errors, values }) =>
+                      !isSubmitted ? (
+                        <div>
+                          <Form css={[tw`mx-auto max-w-xs`]} >
+                            {/* <Input type="email" placeholder="Email" />
                           <Input type="password" placeholder="Password" /> */}
 
-                          <div className="form-group" style={{ marginTop: "1.25rem" }}>
-                            <Field
-                              type="email"
-                              name="email"
-                              placeholder="Enter email"
-                              autocomplete="off"
-                              css={[tw`w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5 first:mt-0`]}
-                              className={`mt-2 form-control ${touched.email && errors.email ? "is-invalid" : ""}`}
-                            />
-                            <ErrorMessage
-                              component="div"
-                              name="email"
-                              className="invalid-feedback"
-                            />
-                          </div>
+                            <div className="form-group" style={{ marginTop: "1.25rem" }}>
+                              <Field
+                                type="email"
+                                name="email"
+                                placeholder="Enter email"
+                                autocomplete="off"
+                                css={[tw`w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5 first:mt-0`]}
+                                className={`mt-2 form-control ${touched.email && errors.email ? "is-invalid" : ""}`}
+                              />
+                              <ErrorMessage
+                                component="div"
+                                name="email"
+                                className="invalid-feedback"
+                                style={{ color: "red", fontSize: '0.8rem' }}
+                              />
+                            </div>
 
-                          <div className="form-group" style={{ marginTop: "1.25rem" }}>
-                            <Field
-                              type="password"
-                              name="password"
-                              placeholder="Enter password"
-                              autocomplete="off"
-                              css={[tw`w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5 first:mt-0`]}
-                              className={`mt-2 form-control ${touched.password && errors.password
-                                ? "is-invalid"
-                                : ""
-                                }`}
-                            />
-                            <ErrorMessage
-                              component="div"
-                              name="password"
-                              className="invalid-feedback"
-                            />
-                          </div>
-                          <SubmitButton type="submit">
-                            <SubmitButtonIcon className="icon" />
-                            <span className="text">{submitButtonText}</span>
-                          </SubmitButton>
-                        </Form>
-                      </div>
-                    ) : (
-                      <div>
+                            <div className="form-group" style={{ marginTop: "1.25rem" }}>
+                              <Field
+                                type="password"
+                                name="password"
+                                placeholder="Enter password"
+                                autocomplete="off"
+                                css={[tw`w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5 first:mt-0`]}
+                                className={`mt-2 form-control ${touched.password && errors.password
+                                  ? "is-invalid"
+                                  : ""
+                                  }`}
+                              />
 
-                      </div>
-                    )
-                }
-              </Formik>
-              <p tw="mt-6 text-xs text-gray-600 text-center">
-                <a href={forgotPasswordUrl} tw="border-b border-gray-500 border-dotted">
-                  Forgot Password ?
-                </a>
-              </p>
-              <p tw="mt-8 text-sm text-gray-600 text-center">
-                Dont have an account?{" "}
-                <a href={signupUrl} tw="border-b border-gray-500 border-dotted">
-                  Sign Up
-                </a>
-              </p>
-            </FormContainer>
-          </MainContent>
-        </MainContainer>
-        <IllustrationContainer>
-          <IllustrationImage imageSrc={illustrationImageSrc} />
-        </IllustrationContainer>
-      </Content>
-    </Container >
-  </AnimationRevealPage >
-);
+                              <ErrorMessage
+                                component="div"
+                                name="password"
+                                className="invalid-feedback"
+                                style={{ color: "red", fontSize: '0.8rem' }}
+                              />
+                            </div>
+                            <SubmitButton type="submit">
+                              <SubmitButtonIcon className="icon" />
+                              <span className="text">{submitButtonText}</span>
+                            </SubmitButton>
+                          </Form>
+                        </div>
+                      ) : (
+                        <div css={[tw`text-center`]} >
+                          <ClipLoader loading={isSubmitted} css={{ display: "block", margin: "0 auto", borderColor: "red" }} size={150} />
+                          <p>Processing your information...</p>
+                        </div>
+                      )
+                  }
+                </Formik>
+                <p tw="mt-6 text-xs text-gray-600 text-center">
+                  <a href={forgotPasswordUrl} tw="border-b border-gray-500 border-dotted">
+                    Forgot Password ?
+                  </a>
+                </p>
+                <p tw="mt-8 text-sm text-gray-600 text-center">
+                  Dont have an account?{" "}
+                  <a href={signupUrl} tw="border-b border-gray-500 border-dotted">
+                    Sign Up
+                  </a>
+                </p>
+              </FormContainer>
+            </MainContent>
+          </MainContainer>
+          <IllustrationContainer>
+            <IllustrationImage imageSrc={illustrationImageSrc} />
+          </IllustrationContainer>
+        </Content>
+      </Container >
+    </AnimationRevealPage >
+  )
+}
