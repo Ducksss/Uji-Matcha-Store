@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require('cors')
 const config = require('./src/config/config');
 const formData = require('express-form-data');
+// const sockets = require('./src/socket')
+//const dummyUserFn = require('./src/middlewares/dummyUserFn');
 
 let app = express();
 const corsOptions = {
@@ -20,13 +22,13 @@ const io = require("socket.io")(server, {
     }
 })
 
-sockets(io)
+// sockets(io)
 
 //Server Settings
 const PORT = 8003;
 const path = require("path");
 const bodyParser = require("body-parser");
-const mainRouter = require("./src/router");
+const bootstrap = require("./src/bootstrap");
 
 //Parse data with connect-multiparty. 
 app.use(formData.parse({}));
@@ -51,7 +53,7 @@ app.use(router);
 const rootPath = path.resolve("./dist");
 
 app.use(express.static(rootPath));
-mainRouter(app, router);
+bootstrap(app, router);
 
 //Index Page (Home public page)
 router.get('/', (req, res, next) => {
