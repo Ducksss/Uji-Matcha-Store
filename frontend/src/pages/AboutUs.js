@@ -59,7 +59,7 @@ export default () => {
         ]}
         linkText=""
       />
-      <TeamCardGrid 
+      <TeamCardGrid
         subheading={<Subheading>Our Team</Subheading>}
       />
       <Footer />

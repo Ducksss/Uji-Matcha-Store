@@ -24,7 +24,7 @@
     "twin.macro": "^2.3.3"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "SET PORT=3004 && react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
@@ -32,16 +32,14 @@
   },
   "eslintConfig": {
     "extends": "react-app",
-    "overrides": [
-      {
-        "files": [
-          "src/**/*.js"
-        ],
-        "rules": {
-          "import/no-anonymous-default-export": "off"
-        }
+    "overrides": [{
+      "files": [
+        "src/**/*.js"
+      ],
+      "rules": {
+        "import/no-anonymous-default-export": "off"
       }
-    ]
+    }]
   },
   "browserslist": {
     "production": [

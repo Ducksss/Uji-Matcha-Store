@@ -114,7 +114,7 @@ export default function App() {
   return (
     <Router>
       <Switch>
-        <Route path="/">
+        <Route path="/*">
           <RestaurantLandingPage />
         </Route>
         <Route path="/components/:type/:subtype/:name">
