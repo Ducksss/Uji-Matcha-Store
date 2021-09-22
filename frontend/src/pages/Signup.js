@@ -8,7 +8,7 @@ import * as Yup from "yup";
 import config from "../Config.js";
 import { useHistory } from "react-router-dom";
 import ClipLoader from "react-spinners/ClipLoader";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Formik, useFormik, FormikProvider, Form, Field, ErrorMessage } from "formik";
 
 // styling 
 import tw, { css } from "twin.macro";

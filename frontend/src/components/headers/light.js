@@ -5,7 +5,7 @@ import tw from "twin.macro";
 import axios from "axios";
 import config from "../../Config";
 import { motion } from "framer-motion";
-import Button from 'react-bootstrap/Button';
+import { Button, Dropdown, Navbar } from 'react-bootstrap';
 // import axiosConfig from '../../shared/axiosConfig';
 import useAnimatedNavToggler from "../../helpers/useAnimatedNavToggler.js";
 
@@ -13,6 +13,7 @@ import useAnimatedNavToggler from "../../helpers/useAnimatedNavToggler.js";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
 import { css } from "styled-components/macro"; //eslint-disable-line
+import { MDBDropdown, MDBDropdownMenu, MDBDropdownToggle, MDBDropdownItem, MDBDropdownLink } from 'mdb-react-ui-kit';
 
 // icons
 import logo from "../../images/logo.svg";
@@ -86,11 +87,16 @@ export default function Headers({ roundedHeaderButton = false, logoLink, links, 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    if (!hasLoaded) getList();
+    axios.defaults.headers.common = { 'Authorization': `bearer ${localStorage.token}` }
+
+    if (!hasLoaded) {
+      getList();
+    }
   })
 
   const getList = async () => {
-    axios.get(`${config.baseUrl}/u/user/role`)
+    await axios
+      .get(`${config.baseUrl}/u/user/role`)
       .then((result) => {
         setIsLoggedIn(true);
         let type = result.data.content[0].type;
@@ -111,7 +117,6 @@ export default function Headers({ roundedHeaderButton = false, logoLink, links, 
     window.localStorage.clear();
     setIsLoggedIn(false);
     history.push('/');
-    console.log(isLoggedIn)
   }
 
   const defaultLogoLink = (
@@ -140,10 +145,16 @@ export default function Headers({ roundedHeaderButton = false, logoLink, links, 
       <NavLink href="/#">Blog</NavLink>
       <NavLink href="/#">Pricing</NavLink>
       <NavLink href="/#">Contact Us</NavLink>
-      {/* <PrimaryLink css={roundedHeaderButton && tw`rounded-full`}>
+      {!isCustomer ? (
+        <NavLink href="/#">
+          Testing
+        </NavLink>
+      ) : (
+        ''
+      )}
+      <PrimaryLink css={roundedHeaderButton && tw`rounded-full`}>
         <Button onClick={signout}>Logout</Button>
-      </PrimaryLink> */}
-      <Button onClick={signout}>Log out</Button>
+      </PrimaryLink>
     </NavLinks>
   ];
 
@@ -154,22 +165,24 @@ export default function Headers({ roundedHeaderButton = false, logoLink, links, 
   links = links || defaultLinks;
 
   return (
-    <Header className={className || "header-light"}>
-      <DesktopNavLinks css={collapseBreakpointCss.desktopNavLinks}>
-        {logoLink}
-        {isLoggedIn ? loggedOutLinks : defaultLinks}
-      </DesktopNavLinks>
+    <Navbar bg="light" expand="lg" sticky="top">
+      <Header className={className || "header-light"} sticky="top">
+        <DesktopNavLinks css={collapseBreakpointCss.desktopNavLinks}>
+          {logoLink}
+          {isLoggedIn ? loggedOutLinks : defaultLinks}
+        </DesktopNavLinks>
 
-      <MobileNavLinksContainer css={collapseBreakpointCss.mobileNavLinksContainer}>
-        {logoLink}
-        <MobileNavLinks initial={{ x: "150%", display: "none" }} animate={animation} css={collapseBreakpointCss.mobileNavLinks}>
-          {links}
-        </MobileNavLinks>
-        <NavToggle onClick={toggleNavbar} className={showNavLinks ? "open" : "closed"}>
-          {showNavLinks ? <CloseIcon tw="w-6 h-6" /> : <MenuIcon tw="w-6 h-6" />}
-        </NavToggle>
-      </MobileNavLinksContainer>
-    </Header>
+        <MobileNavLinksContainer css={collapseBreakpointCss.mobileNavLinksContainer}>
+          {logoLink}
+          <MobileNavLinks initial={{ x: "150%", display: "none" }} animate={animation} css={collapseBreakpointCss.mobileNavLinks}>
+            {links}
+          </MobileNavLinks>
+          <NavToggle onClick={toggleNavbar} className={showNavLinks ? "open" : "closed"}>
+            {showNavLinks ? <CloseIcon tw="w-6 h-6" /> : <MenuIcon tw="w-6 h-6" />}
+          </NavToggle>
+        </MobileNavLinksContainer>
+      </Header>
+    </Navbar>
   );
 };
 

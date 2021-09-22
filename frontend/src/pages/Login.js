@@ -5,10 +5,12 @@ import { Container as ContainerBase } from "components/misc/Layouts";
 // imports
 import axios from "axios";
 import * as Yup from "yup";
+import Swal from 'sweetalert2';
 import config from "../Config.js";
 import { useHistory } from "react-router-dom";
 import ClipLoader from "react-spinners/ClipLoader";
 import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Toast, swalWithBootstrapButtons } from '../shared/swal';
 
 // styling
 import styled from "styled-components";
@@ -99,6 +101,18 @@ export default function Login() {
   const history = useHistory();
   const [isSubmitted, setIsSubmitted] = useState(false);
 
+  const Toast = Swal.mixin({
+    toast: true,
+    position: 'top',
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.addEventListener('mouseenter', Swal.stopTimer)
+      toast.addEventListener('mouseleave', Swal.resumeTimer)
+    }
+  })
+
   const validateLogininformation = (values) => {
     // Insert spinner into here in the future!
     setIsSubmitted(true);
@@ -117,12 +131,18 @@ export default function Login() {
         });
       })
       .catch((error) => {
-        if (error.response.data.description === "Invalid Credentials.") {
-          console.log("Please key in a your valid credentials")
+        if (error.response.data.description === "Login failed.") {
+          Toast.fire({
+            icon: 'error',
+            title: `Please key in a your valid credentials.`
+          })
         }
 
         if (error.response.data.description === "Internal error") {
-          console.log("Please contact an administrator for help!")
+          Toast.fire({
+            icon: 'error',
+            title: `Please contact an administrator for help!`
+          })
         }
       })
       .finally(() => {

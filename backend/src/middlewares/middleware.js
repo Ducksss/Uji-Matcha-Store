@@ -5,15 +5,14 @@ const { codes } = require('../config/codes')
 const manageUserService = require('../services/manageUserService')
 
 exports.isLoggedIn = async (req, res, next) => {
-    console.log("DIE OOO")
     let auth = req.headers.authorization;
     if (!auth) return res.status(400).send(codes(400, 'Invalid Request'));
 
     try {
+        console.log(auth)
         let token = auth.split(' ')[1];
         let { userId, email } = jwt.verify(token, config.JWTKey);
 
-        console.log("DIE OOO")
         let getLoggedInData = await manageUserService.isLoggedIn(userId, email);
         if (getLoggedInData.length == 1) {
             let getSuspendedAccount = await manageUserService.isSuspended(userId);

@@ -2,6 +2,7 @@ import React from "react";
 import tw from "twin.macro";
 import { css } from "styled-components/macro"; //eslint-disable-line
 import AnimationRevealPage from "../helpers/AnimationRevealPage.js";
+import Header from "../components/headers/light"
 import Hero from "../components/hero/TwoColumnWithVideo.js";
 import Features from "../components/features/ThreeColSimple.js";
 import MainFeature from "../components/features/TwoColWithButton.js";
@@ -24,6 +25,7 @@ export default () => {
 
   return (
     <AnimationRevealPage>
+      <Header />
       <Hero
         heading={<>Delicious & Affordable <HighlightedText>Meals Near You.</HighlightedText></>}
         description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."

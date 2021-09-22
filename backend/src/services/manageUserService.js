@@ -15,7 +15,8 @@ module.exports.addUser = (username, email, contact, password, address) => {
                                     contact_number
                                 ) 
                                 VALUES 
-                                    (?, ?, ?, ?, ?)`;
+                                    (?, ?, ?, ?, ?)
+                                `;
                     connection.query(query, [username, email, password, address, contact], (err, results) => {
                         if (err) {
                             reject(err);
@@ -25,7 +26,7 @@ module.exports.addUser = (username, email, contact, password, address) => {
                         connection.release();
                     });
                 } catch (error) {
-                    reject(err);
+                    reject(error);
                 }
             }
         });
@@ -38,23 +39,27 @@ module.exports.isLoggedIn = (userId, email) => {
             if (err) {
                 resolve(err);
             } else {
-                let query = `SELECT 
-                                user_id 
-                            FROM 
-                                sp_shop.users 
-                            where 
-                                user_id = ? 
-                                and email = ?;
-                            `;
-                connection.query(query, [userId, email], (err, results) => {
-                    if (err) {
-                        console.log(err)
-                        reject(err)
-                    } else {
-                        resolve(results)
-                    }
-                    connection.release()
-                })
+                try {
+                    let query = `SELECT 
+                                    user_id 
+                                FROM 
+                                    sp_shop.users 
+                                where 
+                                    user_id = ? 
+                                    and email = ?;
+                                `;
+                    connection.query(query, [userId, email], (err, results) => {
+                        if (err) {
+                            console.log(err)
+                            reject(err)
+                        } else {
+                            resolve(results)
+                        }
+                        connection.release()
+                    })
+                } catch (error) {
+                    reject(error);
+                }
             }
         })
     })

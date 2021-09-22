@@ -75,7 +75,6 @@ export default ({
 
   return (
     <>
-      <Header />
       <Container>
         <TwoColumn>
           <LeftColumn>
