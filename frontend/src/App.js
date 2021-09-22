@@ -87,7 +87,7 @@ import { css } from "styled-components/macro"; //eslint-disable-line
 // import HotelTravelLandingPage from "demos/HotelTravelLandingPage.js";
 // import AgencyLandingPage from "demos/AgencyLandingPage.js";
 // import SaaSProductLandingPage from "demos/SaaSProductLandingPage.js";
-import RestaurantLandingPage from "demos/RestaurantLandingPage.js";
+// import RestaurantLandingPage from "demos/RestaurantLandingPage.js";
 // import ServiceLandingPage from "demos/ServiceLandingPage.js";
 // import HostingCloudLandingPage from "demos/HostingCloudLandingPage.js";
 
@@ -101,6 +101,7 @@ import SignupPage from "pages/Signup.js";
 // import TermsOfServicePage from "pages/TermsOfService.js";
 // import PrivacyPolicyPage from "pages/PrivacyPolicy.js";
 
+import RestaurantLandingPage from "./pages/RestaurantLandingPage";
 import ComponentRenderer from "ComponentRenderer.js";
 import MainLandingPage from "MainLandingPage.js";
 import ThankYouPage from "ThankYouPage.js";
@@ -132,6 +133,10 @@ export default function App() {
           <ThankYouPage />
         </Route>
         <Route path="/">
+          <RestaurantLandingPage />
+        </Route>
+
+        <Route path="/guide">
           <MainLandingPage />
         </Route>
       </Switch>
