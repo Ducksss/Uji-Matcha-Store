@@ -132,12 +132,13 @@ export default function App() {
         <Route path="/thank-you">
           <ThankYouPage />
         </Route>
-        <Route path="/">
-          <RestaurantLandingPage />
-        </Route>
 
         <Route path="/guide">
           <MainLandingPage />
+        </Route>
+        
+        <Route path="/">
+          <RestaurantLandingPage />
         </Route>
       </Switch>
     </Router>
