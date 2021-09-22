@@ -115,9 +115,6 @@ export default function App() {
   return (
     <Router>
       <Switch>
-        <Route path="/">
-          <RestaurantLandingPage />
-        </Route>
         <Route path='/login'>
           <LoginPage />
         </Route>

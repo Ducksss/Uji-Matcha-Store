@@ -76,10 +76,10 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
       <NavLink href="/#">Blog</NavLink>
       <NavLink href="/#">Pricing</NavLink>
       <NavLink href="/#">Contact Us</NavLink>
-      <NavLink href="/#" tw="lg:ml-12!">
+      <NavLink href="http://localhost:3004/login" tw="lg:ml-12!">
         Login
       </NavLink>
-      <PrimaryLink css={roundedHeaderButton && tw`rounded-full`}href="/#">Sign Up</PrimaryLink>
+      <PrimaryLink css={roundedHeaderButton && tw`rounded-full`}href="http://localhost:3004/register">Sign Up</PrimaryLink>
     </NavLinks>
   ];
 
@@ -88,8 +88,8 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
 
   const defaultLogoLink = (
     <LogoLink href="/">
-      <img src={logo} alt="logo" />
-      Treact
+      <img src={"https://res.cloudinary.com/sp-dit-chai-pin-zheng/image/upload/v1632323795/xjtgd30kagk11u0a54fr.png"} alt="logo" />
+      Uji Matcha Confectionaries
     </LogoLink>
   );
 
