@@ -2,7 +2,7 @@
 config = require('../config/config');
 const pool = require('../config/database')
 
-module.exports.addUser = (blockNumber, blockLevel, unitLevel, addressLine, country, region, city, postalCode) => {
+module.exports.addUser = (username, email, contact, password, address) => {
     return new Promise((resolve, reject) => {
         pool.getConnection(async (err, connection) => {
             if (err) {
@@ -10,15 +10,13 @@ module.exports.addUser = (blockNumber, blockLevel, unitLevel, addressLine, count
             } else {
                 try {
                     //stores current into repository of history
-                    let query = `INSERT INTO eiso_management_database.addresses(
-                                    block_no, block_level, unit_no, address_line_1, 
-                                    city, state, country, postal_code
+                    let query = `INSERT INTO sp_shop.users (
+                                    username, email, password, address, 
+                                    contact_number
                                 ) 
                                 VALUES 
-                                    (?, ?, ?, ?, ?, ?, ?, ?)
-                                
-                                `;
-                    connection.query(query, [blockNumber, blockLevel, unitLevel, addressLine, city, region, country, postalCode], (err, results) => {
+                                    (?, ?, ?, ?, ?)`;
+                    connection.query(query, [username, email, password, address, contact], (err, results) => {
                         if (err) {
                             reject(err);
                         } else {

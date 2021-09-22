@@ -65,6 +65,9 @@ const IllustrationImage = styled.div`
 `;
 
 const LoginSchema = Yup.object().shape({
+  username: Yup.string()
+    .min(8, "Your user name must be 8 characters long")
+    .required("Please enter your username!"),
   email: Yup.string()
     .email("Invalid email address format")
     .required("Please enter your email address!"),
@@ -72,7 +75,9 @@ const LoginSchema = Yup.object().shape({
     .min(8, "Password must be 8 characters at minimum")
     .required("Please enter you password!"),
   contact: Yup.string()
-    .required("Please enter your contact number")
+    .required("Please enter your contact number!"),
+  address: Yup.string()
+    .required("Please enter your address!"),
 });
 
 export default function Signup() {
@@ -101,11 +106,34 @@ export default function Signup() {
   const history = useHistory();
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const override = css`
-    display: block;
-    margin: 0 auto;
-    border-color: red;
-  `;
+  const registerUserInformation = (values) => {
+    axios
+      .post(`${config.baseUrl}/u/user/create-account`, {
+        email: values.email,
+        username: values.username,
+        password: values.password,
+        contact: values.contact,
+        address: values.address
+      })
+      .then((results) => {
+        history.push({
+          pathname: "/login",
+          state: "success"
+        });
+      })
+      .catch((error) => {
+        if (error.response.data.description === "Invalid Credentials.") {
+          console.log("Please key in a your valid credentials")
+        }
+
+        if (error.response.data.description === "Internal error") {
+          console.log("Please contact an administrator for help!")
+        }
+      })
+      .finally(() => {
+        setIsSubmitted(false);
+      })
+  }
 
   return (
     <AnimationRevealPage>
@@ -118,7 +146,7 @@ export default function Signup() {
             <MainContent>
               <Heading>{headingText}</Heading>
               <FormContainer>
-                <SocialButtonsContainer>
+                {/* <SocialButtonsContainer>
                   {socialButtons.map((socialButton, index) => (
                     <SocialButton key={index} href={socialButton.url}>
                       <span className="iconContainer">
@@ -130,40 +158,144 @@ export default function Signup() {
                 </SocialButtonsContainer>
                 <DividerTextContainer>
                   <DividerText>Or Sign up with your e-mail</DividerText>
-                </DividerTextContainer>
+                </DividerTextContainer> */}
                 <Formik
                   initialValues={{ email: "", password: "" }}
                   validationSchema={LoginSchema}
                   onSubmit={(values) => {
-                    setIsSubmitted(true)
-                    console.log(values);
+                    registerUserInformation(values);
                   }}
                 >
-                  <Form css={[tw`mx-auto max-w-xs`]} >
-                    <Input type="email" placeholder="Email" />
-                    <Input type="password" placeholder="Password" />
-                    <SubmitButton type="submit">
-                      <SubmitButtonIcon className="icon" />
-                      <span className="text">{submitButtonText}</span>
-                    </SubmitButton>
-                    <p tw="mt-6 text-xs text-gray-600 text-center">
-                      I agree to abide by treact's{" "}
-                      <a href={tosUrl} tw="border-b border-gray-500 border-dotted">
-                        Terms of Service
-                      </a>{" "}
-                      and its{" "}
-                      <a href={privacyPolicyUrl} tw="border-b border-gray-500 border-dotted">
-                        Privacy Policy
-                      </a>
-                    </p>
+                  {
+                    ({ touched, errors, values }) =>
+                      !isSubmitted ? (
+                        <Form css={[tw`mx-auto max-w-xs`]} >
+                          {/* <Input type="email" placeholder="Email" />
+                          <Input type="password" placeholder="Password" /> */}
+                          <div className="form-group" style={{ marginTop: "1.25rem" }}>
+                            <Field
+                              type="text"
+                              name="username"
+                              placeholder="Enter username"
+                              autocomplete="off"
+                              css={[tw`w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5 first:mt-0`]}
+                              className={`mt-2 form-control ${touched.username && errors.username ? "is-invalid" : ""}`}
+                            />
+                            <ErrorMessage
+                              component="div"
+                              name="username"
+                              className="invalid-feedback"
+                              style={{ color: "red", fontSize: '0.8rem' }}
+                            />
+                          </div>
 
-                    <p tw="mt-8 text-sm text-gray-600 text-center">
-                      Already have an account?{" "}
-                      <a href={signInUrl} tw="border-b border-gray-500 border-dotted">
-                        Sign In
-                      </a>
-                    </p>
-                  </Form>
+                          <div className="form-group" style={{ marginTop: "1.25rem" }}>
+                            <Field
+                              type="email"
+                              name="email"
+                              placeholder="Enter email"
+                              autocomplete="off"
+                              css={[tw`w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5 first:mt-0`]}
+                              className={`mt-2 form-control ${touched.email && errors.email ? "is-invalid" : ""}`}
+                            />
+                            <ErrorMessage
+                              component="div"
+                              name="email"
+                              className="invalid-feedback"
+                              style={{ color: "red", fontSize: '0.8rem' }}
+                            />
+                          </div>
+
+                          <div className="form-group" style={{ marginTop: "1.25rem" }}>
+                            <Field
+                              type="password"
+                              name="password"
+                              placeholder="Enter password"
+                              autocomplete="off"
+                              css={[tw`w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5 first:mt-0`]}
+                              className={`mt-2 form-control ${touched.password && errors.password
+                                ? "is-invalid"
+                                : ""
+                                }`}
+                            />
+                            <ErrorMessage
+                              component="div"
+                              name="password"
+                              className="invalid-feedback"
+                              style={{ color: "red", fontSize: '0.8rem' }}
+                            />
+                          </div>
+
+                          <div className="form-group" style={{ marginTop: "1.25rem" }}>
+                            <Field
+                              type="text"
+                              name="contact"
+                              placeholder="Enter contact number"
+                              autocomplete="off"
+                              css={[tw`w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5 first:mt-0`]}
+                              className={`mt-2 form-control ${touched.contact && errors.contact
+                                ? "is-invalid"
+                                : ""
+                                }`}
+                            />
+                            <ErrorMessage
+                              component="div"
+                              name="contact"
+                              className="invalid-feedback"
+                              style={{ color: "red", fontSize: '0.8rem' }}
+                            />
+                          </div>
+
+                          <div className="form-group" style={{ marginTop: "1.25rem" }}>
+                            <Field
+                              type="text"
+                              name="address"
+                              placeholder="Enter address information"
+                              autocomplete="off"
+                              css={[tw`w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5 first:mt-0`]}
+                              className={`mt-2 form-control ${touched.address && errors.address
+                                ? "is-invalid"
+                                : ""
+                                }`}
+                            />
+                            <ErrorMessage
+                              component="div"
+                              name="address"
+                              className="invalid-feedback"
+                              style={{ color: "red", fontSize: '0.8rem' }}
+                            />
+                          </div>
+
+                          <SubmitButton type="submit">
+                            <SubmitButtonIcon className="icon" />
+                            <span className="text">{submitButtonText}</span>
+                          </SubmitButton>
+
+                          <p tw="mt-6 text-xs text-gray-600 text-center">
+                            I agree to abide by treact's{" "}
+                            <a href={tosUrl} tw="border-b border-gray-500 border-dotted">
+                              Terms of Service
+                            </a>{" "}
+                            and its{" "}
+                            <a href={privacyPolicyUrl} tw="border-b border-gray-500 border-dotted">
+                              Privacy Policy
+                            </a>
+                          </p>
+
+                          <p tw="mt-8 text-sm text-gray-600 text-center">
+                            Already have an account?{" "}
+                            <a href={signInUrl} tw="border-b border-gray-500 border-dotted">
+                              Sign In
+                            </a>
+                          </p>
+                        </Form>
+                      ) : (
+                        <div css={[tw`text-center`]} >
+                          <ClipLoader loading={isSubmitted} css={{ display: "block", margin: "0 auto", borderColor: "red" }} size={150} />
+                          <p>Processing your information...</p>
+                        </div>
+                      )
+                  }
                 </Formik>
               </FormContainer>
             </MainContent>
