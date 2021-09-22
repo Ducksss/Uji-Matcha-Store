@@ -121,9 +121,6 @@ export default function App(props) {
   return (
     <Router {...props}>
       <Switch>
-        <Route path="/" >
-          <RestaurantLandingPage />
-        </Route>
 
         <Route path='/login'>
           <LoginPage />
@@ -144,6 +141,10 @@ export default function App(props) {
 
         <Route path="/guide">
           <MainLandingPage />
+        </Route>
+
+        <Route path="/" >
+          <RestaurantLandingPage />
         </Route>
       </Switch>
     </Router>
