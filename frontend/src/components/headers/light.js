@@ -1,11 +1,20 @@
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useEffect, useState } from "react";
 import tw from "twin.macro";
-import styled from "styled-components";
-import { css } from "styled-components/macro"; //eslint-disable-line
 
+// imports
+import axios from "axios";
+import config from "../../Config";
+import { motion } from "framer-motion";
+import Button from 'react-bootstrap/Button';
+// import axiosConfig from '../../shared/axiosConfig';
 import useAnimatedNavToggler from "../../helpers/useAnimatedNavToggler.js";
 
+// styling
+import styled from "styled-components";
+import { useHistory } from "react-router-dom";
+import { css } from "styled-components/macro"; //eslint-disable-line
+
+// icons
 import logo from "../../images/logo.svg";
 import { ReactComponent as MenuIcon } from "feather-icons/dist/icons/menu.svg";
 import { ReactComponent as CloseIcon } from "feather-icons/dist/icons/x.svg";
@@ -56,7 +65,7 @@ export const DesktopNavLinks = tw.nav`
   hidden lg:flex flex-1 justify-between items-center
 `;
 
-export default ({ roundedHeaderButton = false, logoLink, links, className, collapseBreakpointClass = "lg" }) => {
+export default function Headers({ roundedHeaderButton = false, logoLink, links, className, collapseBreakpointClass = "lg" }) {
   /*
    * This header component accepts an optionals "links" prop that specifies the links to render in the navbar.
    * This links props should be an array of "NavLinks" components which is exported from this file.
@@ -70,6 +79,48 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
    * changing the defaultLinks variable below below.
    * If you manipulate links here, all the styling on the links is already done for you. If you pass links yourself though, you are responsible for styling the links or use the helper styled components that are defined here (NavLink)
    */
+
+  const history = useHistory();
+  const [hasLoaded, setHasLoaded] = useState(false);
+  const [isCustomer, setIsCustomer] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    if (!hasLoaded) getList();
+  })
+
+  const getList = async () => {
+    axios.get(`${config.baseUrl}/u/user/role`)
+      .then((result) => {
+        setIsLoggedIn(true);
+        let type = result.data.content[0].type;
+
+        if (type === "Admin") {
+          setIsCustomer(false);
+        }
+      })
+      .catch((error) => {
+        console.log(error)
+        setIsLoggedIn(false);
+      })
+
+    setHasLoaded(true);
+  }
+
+  const signout = () => {
+    window.localStorage.clear();
+    setIsLoggedIn(false);
+    history.push('/');
+    console.log(isLoggedIn)
+  }
+
+  const defaultLogoLink = (
+    <LogoLink href="/">
+      <img src={"https://res.cloudinary.com/sp-dit-chai-pin-zheng/image/upload/v1632323795/xjtgd30kagk11u0a54fr.png"} alt="logo" />
+      Uji Matcha Confectionaries
+    </LogoLink>
+  );
+
   const defaultLinks = [
     <NavLinks key={1}>
       <NavLink href="/#">About</NavLink>
@@ -79,19 +130,25 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
       <NavLink href="http://localhost:3004/login" tw="lg:ml-12!">
         Login
       </NavLink>
-      <PrimaryLink css={roundedHeaderButton && tw`rounded-full`}href="http://localhost:3004/register">Sign Up</PrimaryLink>
+      <PrimaryLink css={roundedHeaderButton && tw`rounded-full`} href="http://localhost:3004/register">Sign Up</PrimaryLink>
+    </NavLinks>
+  ];
+
+  const loggedOutLinks = [
+    <NavLinks key={2}>
+      <NavLink href="/#">About</NavLink>
+      <NavLink href="/#">Blog</NavLink>
+      <NavLink href="/#">Pricing</NavLink>
+      <NavLink href="/#">Contact Us</NavLink>
+      {/* <PrimaryLink css={roundedHeaderButton && tw`rounded-full`}>
+        <Button onClick={signout}>Logout</Button>
+      </PrimaryLink> */}
+      <Button onClick={signout}>Log out</Button>
     </NavLinks>
   ];
 
   const { showNavLinks, animation, toggleNavbar } = useAnimatedNavToggler();
   const collapseBreakpointCss = collapseBreakPointCssMap[collapseBreakpointClass];
-
-  const defaultLogoLink = (
-    <LogoLink href="/">
-      <img src={"https://res.cloudinary.com/sp-dit-chai-pin-zheng/image/upload/v1632323795/xjtgd30kagk11u0a54fr.png"} alt="logo" />
-      Uji Matcha Confectionaries
-    </LogoLink>
-  );
 
   logoLink = logoLink || defaultLogoLink;
   links = links || defaultLinks;
@@ -100,7 +157,7 @@ export default ({ roundedHeaderButton = false, logoLink, links, className, colla
     <Header className={className || "header-light"}>
       <DesktopNavLinks css={collapseBreakpointCss.desktopNavLinks}>
         {logoLink}
-        {links}
+        {isLoggedIn ? loggedOutLinks : defaultLinks}
       </DesktopNavLinks>
 
       <MobileNavLinksContainer css={collapseBreakpointCss.mobileNavLinksContainer}>

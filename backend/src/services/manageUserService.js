@@ -87,3 +87,30 @@ module.exports.isSuspended = (userId) => {
         })
     })
 }
+
+module.exports.getRole = (userId) => {
+    return new Promise((resolve, reject) => {
+        pool.getConnection((err, connection) => {
+            if (err) {
+                resolve(err);
+            } else {
+                let query = `SELECT 
+                                type 
+                            FROM 
+                                sp_shop.users 
+                            where 
+                                user_id = ?;
+                            `;
+                connection.query(query, [userId], (err, results) => {
+                    if (err) {
+                        console.log(err)
+                        reject(err)
+                    } else {
+                        resolve(results)
+                    }
+                    connection.release()
+                })
+            }
+        })
+    })
+}

@@ -3,6 +3,9 @@ import "styles/globalStyles.css";
 import React from "react";
 import { css } from "styled-components/macro"; //eslint-disable-line
 
+// imports
+import axios from "axios";
+
 /*
  * This is the entry point component of this project. You can change the below exported default App component to any of
  * the prebuilt landing page components by uncommenting their import and export lines respectively.
@@ -106,15 +109,22 @@ import ComponentRenderer from "ComponentRenderer.js";
 import MainLandingPage from "MainLandingPage.js";
 import ThankYouPage from "ThankYouPage.js";
 
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { Route, BrowserRouter as Router, Switch, Redirect } from 'react-router-dom'
 
-export default function App() {
+// configs
+axios.defaults.headers.common = { 'Authorization': `bearer ${localStorage.token}` }
+
+export default function App(props) {
   // If you want to disable the animation just use the disabled `prop` like below on your page's component
   // return <AnimationRevealPage disabled>xxxxxxxxxx</AnimationRevealPage>;
 
   return (
-    <Router>
+    <Router {...props}>
       <Switch>
+        <Route path="/" >
+          <RestaurantLandingPage />
+        </Route>
+
         <Route path='/login'>
           <LoginPage />
         </Route>
@@ -134,9 +144,6 @@ export default function App() {
 
         <Route path="/guide">
           <MainLandingPage />
-        </Route>
-        <Route path="/">
-          <RestaurantLandingPage />
         </Route>
       </Switch>
     </Router>

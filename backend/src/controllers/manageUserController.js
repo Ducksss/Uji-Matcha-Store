@@ -41,9 +41,12 @@ exports.addUser = async (req, res, next) => {
 
 exports.verifyRole = async (req, res, next) => {
     try {
-        let { userId, email } = req
-        console.log("Here was reached minimally")
+        let { userId } = req;
+        let results = await manageUsers.getRole(userId);
+
+        return res.status(200).send(codes(200, null, results));
     } catch (error) {
+        console.log(error)
         return res.status(500).send(codes(500));
     }
 }
