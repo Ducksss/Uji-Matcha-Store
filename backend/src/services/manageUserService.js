@@ -31,3 +31,59 @@ module.exports.addUser = (username, email, contact, password, address) => {
         });
     })
 };
+
+module.exports.isLoggedIn = (userId, email) => {
+    return new Promise((resolve, reject) => {
+        pool.getConnection((err, connection) => {
+            if (err) {
+                resolve(err);
+            } else {
+                let query = `SELECT 
+                                user_id 
+                            FROM 
+                                sp_shop.users 
+                            where 
+                                user_id = ? 
+                                and email = ?;
+                            `;
+                connection.query(query, [userId, email], (err, results) => {
+                    if (err) {
+                        console.log(err)
+                        reject(err)
+                    } else {
+                        resolve(results)
+                    }
+                    connection.release()
+                })
+            }
+        })
+    })
+}
+
+module.exports.isSuspended = (userId) => {
+    return new Promise((resolve, reject) => {
+        pool.getConnection((err, connection) => {
+            if (err) {
+                resolve(err);
+            } else {
+                let query = `SELECT 
+                                status 
+                            from 
+                                sp_shop.users 
+                            where 
+                                user_id = ? 
+                            `;
+
+                connection.query(query, [userId], (err, results) => {
+                    if (err) {
+                        console.log(err)
+                        reject(err)
+                    } else {
+                        resolve(results)
+                    }
+                    connection.release()
+                })
+            }
+        })
+    })
+}

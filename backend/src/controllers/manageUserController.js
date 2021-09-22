@@ -38,3 +38,12 @@ exports.addUser = async (req, res, next) => {
         return res.status(500).send(codes(500));
     }
 };
+
+exports.verifyRole = async (req, res, next) => {
+    try {
+        let { userId, email } = req
+        console.log("Here was reached minimally")
+    } catch (error) {
+        return res.status(500).send(codes(500));
+    }
+}

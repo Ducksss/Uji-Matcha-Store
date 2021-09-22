@@ -73,12 +73,6 @@ const LoginSchema = Yup.object().shape({
     .required("Please enter you password!"),
 });
 
-const override = `
-  display: block;
-  margin: 0 auto;
-  border-color: red;
-`;
-
 export default function Login() {
   // Pre Defined Variables
   const logoLinkUrl = "#";
@@ -103,7 +97,6 @@ export default function Login() {
 
   // Team's Defined Variables
   const history = useHistory();
-  let [color, setColor] = useState("#ffffff");
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const validateLogininformation = (values) => {
@@ -248,4 +241,4 @@ export default function Login() {
       </Container >
     </AnimationRevealPage >
   )
-}
+};
