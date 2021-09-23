@@ -11,9 +11,6 @@ module.exports = {
     cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET,
     JWTKey: process.env.JWTKEY,
 
-    mailGunApiKey: process.env.MAILGUN_API_KEY,
-    mailGunDomain: process.env.MAILGUN_DOMAIN,
-
     GMAIL_USER: process.env.GMAIL_USER,
     GMAIL_PASS: process.env.GMAIL_PASS,
 
