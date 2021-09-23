@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import tw from "twin.macro";
 import styled from "styled-components";
@@ -9,7 +9,9 @@ import { PrimaryButton as PrimaryButtonBase } from "components/misc/Buttons.js";
 import { ReactComponent as StarIcon } from "images/star-icon.svg";
 import { ReactComponent as SvgDecoratorBlob1 } from "images/svg-decorator-blob-5.svg";
 import { ReactComponent as SvgDecoratorBlob2 } from "images/svg-decorator-blob-7.svg";
-
+import axios from "axios";
+import config from "../../Config";
+import { object } from "yup/lib/locale";
 const HeaderRow = tw.div`flex justify-between items-center flex-col xl:flex-row`;
 const Header = tw(SectionHeading)``;
 const TabsControl = tw.div`flex flex-wrap bg-gray-200 px-2 py-2 rounded leading-none mt-12 xl:mt-0`;
@@ -58,7 +60,9 @@ const DecoratorBlob2 = styled(SvgDecoratorBlob2)`
   ${tw`pointer-events-none -z-20 absolute left-0 bottom-0 h-80 w-80 opacity-15 transform -translate-x-2/3 text-primary-500`}
 `;
 
+
 export default ({
+
   heading = "Checkout the Menu",
   tabs = {
     Starters: [
@@ -153,9 +157,63 @@ export default ({
    * as the key and value of the key will be its content (as an array of objects).
    * To see what attributes are configurable of each object inside this array see the example above for "Starters".
    */
+  let newObject = {};
   const tabsKeys = Object.keys(tabs);
   const [activeTab, setActiveTab] = useState(tabsKeys[0]);
+  const [hasLoaded, setHasLoaded] = useState(false);
 
+  useEffect(() => {
+    // Update the document title using the browser API
+    if (!hasLoaded) {
+      getList();
+    }
+  });
+  const getList = () => {
+    axios.get(`${config.baseUrl}/u/user/products`)
+      .then((response) => {
+        let records = response.data;
+        console.log(records)
+
+        for (let products of records) {
+          if (Object.keys(newObject).indexOf(products.catname) === -1) {
+            newObject[products.catname] = [{
+              "imageSrc": products.image_location,
+              "title": products.product_title,
+              "content": products.brief_description,
+              "price": products.retail_price,
+              "rating": products.retail_price,
+              "reviews": products.retail_price,
+              "url": products.image_location
+            }];
+          } else {
+            newObject[products.catname][newObject[products.catname].filter(item => item.imageSrc != null).length] = {
+              "imageSrc": products.image_location,
+              "title": products.product_title,
+              "content": products.brief_description,
+              "price": products.retail_price,
+              "rating": products.retail_price,
+              "reviews": products.retail_price,
+              "url": products.image_location
+            };
+          }
+          // let tabNames
+        }
+        console.log("1")
+        // const formattedRecords = records.map((data) => {
+        //   alert(records)
+        //   return data;
+        // });
+        tabs = newObject
+        
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        console.log()
+        setHasLoaded(true);
+      });
+  }
   return (
     <Container>
       <ContentWithPaddingXl>
@@ -176,12 +234,12 @@ export default ({
             variants={{
               current: {
                 opacity: 1,
-                scale:1,
+                scale: 1,
                 display: "flex",
               },
               hidden: {
                 opacity: 0,
-                scale:0.8,
+                scale: 0.8,
                 display: "none",
               }
             }}

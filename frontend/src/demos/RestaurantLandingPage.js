@@ -9,6 +9,7 @@ import MainFeature2 from "components/features/TwoColSingleFeatureWithStats2.js";
 import TabGrid from "components/cards/TabCardGrid.js";
 import Testimonial from "components/testimonials/ThreeColumnWithProfileImage.js";
 import DownloadApp from "components/cta/DownloadApp.js";
+import axios from "axios";
 import Footer from "components/footers/FiveColumnWithInputForm.js";
 
 import chefIconImageSrc from "images/chef-icon.svg";
@@ -16,17 +17,43 @@ import celebrationIconImageSrc from "images/celebration-icon.svg";
 import shopIconImageSrc from "images/shop-icon.svg";
 
 export default () => {
+  
   const Subheading = tw.span`tracking-wider text-sm font-medium`;
   const HighlightedText = tw.span`bg-primary-500 text-gray-100 px-4 transform -skew-x-12 inline-block`;
   const HighlightedTextInverse = tw.span`bg-gray-100 text-primary-500 px-4 transform -skew-x-12 inline-block`;
   const Description = tw.span`inline-block mt-8`;
   const imageCss = tw`rounded-4xl`;
+  // useEffect(() => {
+  //   // Update the document title using the browser API
+  //   if (!hasLoaded) {
+  //     getList();
+  //   }
+  // });
+  // const getList = () => {
+  //   axios.get(`${config.baseUrl}/a/admin/company/name`)
+  //     .then((response) => {
+  //       let increment = 1;
+  //       let records = response.data;
+  //       const formattedRecords = records.map((data) => {
+  //         data.id_faker = increment;
+  //         increment++;
+  //         return data;
+  //       });
 
+  //       setCompanyList(formattedRecords);
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     })
+  //     .finally(() => {
+  //       setHasLoaded(true);
+  //     });
+  // }
   return (
     <AnimationRevealPage>
       <Hero
         heading={<>Delicious & Affordable <HighlightedText>Meals Near You.</HighlightedText></>}
-        description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+        description="With Muji's anything is possible"
         imageSrc="https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=768&q=80"
         imageCss={imageCss}
         imageDecoratorBlob={true}

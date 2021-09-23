@@ -47,7 +47,7 @@ exports.processUserLogin = async (req, res) => {
             };
 
             console.log("Here is still successful - 4")
-            console.log(data)
+            // console.log(data)
             return res.status(200).send(data);
         } else {
             return res.status(401).send(codes(401, 'Login failed.'));
