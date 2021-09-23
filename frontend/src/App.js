@@ -1,6 +1,6 @@
 import "tailwindcss/dist/base.css";
 import "styles/globalStyles.css";
-import React from "react";
+import React, {useEffect} from "react";
 import { css } from "styled-components/macro"; //eslint-disable-line
 
 // imports
@@ -112,12 +112,17 @@ import ThankYouPage from "ThankYouPage.js";
 import { Route, BrowserRouter as Router, Switch, Redirect } from 'react-router-dom'
 
 // configs
-axios.defaults.headers.common = { 'Authorization': `bearer ${localStorage.token}` }
 
 export default function App(props) {
   // If you want to disable the animation just use the disabled `prop` like below on your page's component
   // return <AnimationRevealPage disabled>xxxxxxxxxx</AnimationRevealPage>;
 
+  useEffect(() => {
+    if(localStorage.token) {
+      axios.defaults.headers.common = { 'Authorization': `bearer ${localStorage.token}` }
+    }
+  })
+  
   return (
     <Router {...props}>
       <Switch>
