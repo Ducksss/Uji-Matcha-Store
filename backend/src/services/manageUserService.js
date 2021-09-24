@@ -119,3 +119,29 @@ module.exports.getRole = (userId) => {
         })
     })
 }
+
+module.exports.getEmail = (email) => {
+    return new Promise((resolve, reject) => {
+        pool.getConnection((err, connection) => {
+            if (err) {
+                resolve(err);
+            } else {
+                let query = `SELECT 
+                                email 
+                            FROM 
+                                sp_shop.users 
+                            where 
+                                email = ?;
+                            `;
+                connection.query(query, [email], (err, results) => {
+                    if (err) {
+                        reject(err)
+                    } else {
+                        resolve(results)
+                    }
+                    connection.release()
+                })
+            }
+        })
+    })
+}

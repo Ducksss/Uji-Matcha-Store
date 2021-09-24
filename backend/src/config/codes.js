@@ -51,6 +51,12 @@ const httpCodeObj = {
         description: "Not Acceptable",
         content: []
     },
+    409: {
+        code: 409,
+        error: true,
+        description: "conflict",
+        content: []
+    },
     500: {
         code: 500,
         error: true,
@@ -61,7 +67,7 @@ const httpCodeObj = {
 
 module.exports.codes = (statusCode, message, content) => {
     let httpCode = httpCodeObj[statusCode]
-    
+
     if (message) {
         httpCode.description = message
     }

@@ -104,6 +104,7 @@ import axios from "axios";
 
 import LoginPage from "pages/Login.js";
 import SignupPage from "pages/Signup.js";
+import TrialTest from "pages/TrialTest.js"
 import RestaurantLandingPage from "./pages/RestaurantLandingPage";
 import ComponentRenderer from "ComponentRenderer.js";
 import MainLandingPage from "MainLandingPage.js";
@@ -132,6 +133,9 @@ export default function App(props) {
         </Route>
         <Route path='/register'>
           <SignupPage />
+        </Route>
+        <Route path="/trial">
+          <TrialTest />
         </Route>
 
         <Route path="/components/:type/:subtype/:name">

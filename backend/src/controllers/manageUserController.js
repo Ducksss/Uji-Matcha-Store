@@ -50,3 +50,20 @@ exports.verifyRole = async (req, res, next) => {
         return res.status(500).send(codes(500));
     }
 }
+
+exports.checkDuplicateEmails = async (req, res, next) => {
+    try {
+        console.log("TRIAL")
+        let { email } = req.params;
+        let results = await manageUsers.getEmail(email);
+
+        if (results.length === 1) {
+            return res.status(409).send(codes(409, null, "The email has already been taken."))
+        } else {
+            return res.status(200).send(codes(200, null, results));
+        }
+    } catch (error) {
+        console.log(error)
+        return res.status(500).send(codes(500));
+    }
+}
