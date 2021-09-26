@@ -91,7 +91,6 @@ const MyTextInput = ({ label, ...props }) => {
 
 const TextInputLiveFeedback = ({ label, helpText, ...props }) => {
     const [field, meta] = useField(props);
-    console.log(meta)
 
     // Show inline feedback if EITHER
     // - the input is focused AND value is longer than 2 characters
@@ -191,7 +190,10 @@ const TextInputLiveFeedback2 = ({ label, helpText, ...props }) => {
 const Example = () => {
     const formik = useFormik({
         initialValues: {
-            username: '',
+            firstName: '',
+            lastName: '',
+            email: '',
+            number: ''
         },
         onSubmit: async (values) => {
             await sleep(500);
@@ -209,20 +211,27 @@ const Example = () => {
                 .max(20, 'Must be less  than 20 characters')
                 .required('Username is required')
                 .test('Unique Email', 'Email has already been taken', // <- key, message
-                    function (value) {
-                        return new Promise((resolve, reject) => {
-                            axios.get(`http://localhost:8003/api/u/user/${value}/available`)
-                                .then((res) => {
-                                    resolve(true)
-                                })
-                                .catch((error) => {
-                                    if (error.response.data.content === "The email has already been taken.") {
-                                        resolve(false);
-                                    }
-                                })
-                        })
+                    function (value, testContext) {
+                        var boolean = (testContext.originalValue == value) && (testContext.originalValue != null)
+                        console.log(testContext)
+                        if (boolean) {
+                            console.log("Calling backend")
+                            return new Promise((resolve, reject) => {
+                                axios.get(`http://localhost:8003/api/u/user/${value}/available`)
+                                    .then((res) => {
+                                        resolve(true)
+                                    })
+                                    .catch((error) => {
+                                        if (error.response.data.content === "The email has already been taken.") {
+                                            resolve(false);
+                                        }
+                                    })
+                            })
+                        }
                     }
                 ),
+            number: Yup.string().
+                required('required')
         }),
     });
 
@@ -249,6 +258,13 @@ const Example = () => {
                     name="email"
                     helpText="Must be 8-20 characters and cannot contain special characters."
                     type="text"
+                />
+
+                <MyTextInput
+                    label="Contact Number"
+                    name="number"
+                    type="text"
+                    placeholder="Doe"
                 />
                 <div>
                     <button type="submit">Submit</button>
