@@ -8,7 +8,7 @@ import config from '../Config'
 // trials
 import { Formik } from 'formik';
 import { useFormik, FormikProvider, Form, useField } from 'formik'; // instant feedback
-import { FastField } from 'formik'; // instant feedback
+import { FastField, Field } from 'formik'; // instant feedback
 
 
 // styling
@@ -79,9 +79,41 @@ const MyTextInput = ({ label, ...props }) => {
     // message if the field is invalid and it has been touched (i.e. visited)
     const [field, meta] = useField(props);
     return (
-        <div style={{ marginTop: "1.5rem" }}        >
+        <>
             <label htmlFor={props.id || props.name}>{label}</label>
             <input className="text-input" {...field} {...props} />
+            {meta.touched && meta.error ? (
+                <div className="error">{meta.error}</div>
+            ) : null}
+        </>
+    );
+};
+
+const MyCheckbox = ({ children, ...props }) => {
+    // React treats radios and checkbox inputs differently other input types, select, and textarea.
+    // Formik does this too! When you specify `type` to useField(), it will
+    // return the correct bag of props for you -- a `checked` prop will be included
+    // in `field` alongside `name`, `value`, `onChange`, and `onBlur`
+    const [field, meta] = useField({ ...props, type: 'checkbox' });
+    return (
+        <div>
+            <label className="checkbox-input">
+                <input type="checkbox" {...field} {...props} />
+                {children}
+            </label>
+            {meta.touched && meta.error ? (
+                <div className="error">{meta.error}</div>
+            ) : null}
+        </div>
+    );
+};
+
+const MySelect = ({ label, ...props }) => {
+    const [field, meta] = useField(props);
+    return (
+        <div>
+            <label htmlFor={props.id || props.name}>{label}</label>
+            <select {...field} {...props} />
             {meta.touched && meta.error ? (
                 <div className="error">{meta.error}</div>
             ) : null}
@@ -145,7 +177,6 @@ const TextInputLiveFeedback2 = ({ label, helpText, ...props }) => {
     const showFeedback = (!!didFocus && field.value.trim().length > 2) || meta.touched;
 
     if (meta.touched && !meta.initialTouched && !didCallAxios) {
-        console.log('Call Axios To Validate please' + increment)
         setdidCallAxios(true)
         axios
             .get(`${config.baseUrl}/u/user/${meta.value}/available`)
@@ -187,39 +218,50 @@ const TextInputLiveFeedback2 = ({ label, helpText, ...props }) => {
     );
 };
 
+const validateEmail = (value) => {
+    console.log(value)
+    let error;
+    if (!value) {
+        error = 'Required';
+    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value)) {
+        error = 'Invalid email address';
+    }
+    return error;
+}
+
 const Example = () => {
+
     const formik = useFormik({
         initialValues: {
-            firstName: '',
-            lastName: '',
+            username: '',
             email: '',
-            number: ''
+            number: '',
+            password: '',
+            confirmPassword: ''
         },
         onSubmit: async (values) => {
             await sleep(500);
             alert(JSON.stringify(values, null, 2));
         },
         validationSchema: Yup.object({
-            firstName: Yup.string()
-                .max(15, 'Must be 15 characters or less')
-                .required('Required'),
-            lastName: Yup.string()
+            username: Yup.string()
                 .max(20, 'Must be 20 characters or less')
                 .required('Required'),
             email: Yup.string()
-                .min(8, 'Must be at least 8 characters')
-                .max(20, 'Must be less  than 20 characters')
-                .required('Username is required')
-                .test('Unique Email', 'Email has already been taken', // <- key, message
-                    function (value, testContext) {
+                .email('Invalid email address')
+                .required('Required')
+                .test({
+                    name: 'Unique Email',
+                    message: 'Email has already been taken',
+                    test: (value, testContext) => {
+                        console.log("Still calling this haish - 2")
                         var boolean = (testContext.originalValue == value) && (testContext.originalValue != null)
-                        console.log(testContext)
+                        // console.log(testContext)
                         if (boolean) {
-                            console.log("Calling backend")
                             return new Promise((resolve, reject) => {
                                 axios.get(`http://localhost:8003/api/u/user/${value}/available`)
                                     .then((res) => {
-                                        resolve(true)
+                                        resolve(true);
                                     })
                                     .catch((error) => {
                                         if (error.response.data.content === "The email has already been taken.") {
@@ -229,49 +271,200 @@ const Example = () => {
                             })
                         }
                     }
+                }),
+            number: Yup.string()
+                .required('required'),
+            password: Yup.string()
+                .min(6, 'Password must be at least 6 characters')
+                .required('Password is required')
+                .matches(
+                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
+                    "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and One Special Case Character"
                 ),
-            number: Yup.string().
-                required('required')
+            confirmPassword: Yup.string()
+                .oneOf([Yup.ref('password'), null], 'Password must match')
+                .required('Confirm password is required')
         }),
+        validateOnBlur: true
     });
 
     return (
-        <FormikProvider value={formik}>
+        <FormikProvider value={formik} >
             <Form>
                 <MyTextInput
-                    label="First Name"
-                    name="firstName"
+                    label="Username"
+                    name="username"
                     type="text"
-                    placeholder="Jane"
+                    placeholder="Doe"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
                 />
 
                 <MyTextInput
-                    label="Last Name"
-                    name="lastName"
-                    type="text"
-                    placeholder="Doe"
-                />
-
-                <TextInputLiveFeedback
                     label="Email"
                     id="email"
                     name="email"
                     helpText="Must be 8-20 characters and cannot contain special characters."
                     type="text"
+                    placeholder="terry@gmail.com"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
                 />
 
                 <MyTextInput
                     label="Contact Number"
                     name="number"
                     type="text"
-                    placeholder="Doe"
+                    placeholder="96472290"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                />
+
+                <MyTextInput
+                    label="Password"
+                    name="password"
+                    type="text"
+                    placeholder="Password"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                />
+
+                <MyTextInput
+                    label="Confirm Password"
+                    name="confirmPassword"
+                    type="text"
+                    placeholder="Confirm password"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
                 />
                 <div>
                     <button type="submit">Submit</button>
                     <button type="reset">Reset</button>
                 </div>
             </Form>
-        </FormikProvider>
+        </FormikProvider >
+    );
+};
+
+const MyInput = ({ field, form, ...props }) => {
+    return <input {...field} {...props} />;
+};
+
+// And now we can use these
+const SignupForm = () => {
+
+    return (
+        <>
+            <h1>Subscribe!</h1>
+            <Formik
+                initialValues={{
+                    firstName: '',
+                    lastName: '',
+                    email: '',
+                    acceptedTerms: false, // added for our checkbox
+                    jobType: '', // added for our select
+                }}
+                validationSchema={Yup.object({
+                    firstName: Yup.string()
+                        .max(15, 'Must be 15 characters or less')
+                        .required('Required')
+                        .test({
+                            exclusive: true,
+                        }),
+                    lastName: Yup.string()
+                        .max(20, 'Must be 20 characters or less')
+                        .required('Required')
+                        .test({
+                            exclusive: false,
+                        }),
+                    email: Yup.string()
+                        .email('Invalid email address')
+                        .required('Required')
+                        .test({
+                            name: 'Unique Email',
+                            message: 'Email has already been taken',
+                            exclusive: false,
+                            test: (value, testContext) => {
+                                var boolean = (testContext.originalValue == value) && (testContext.originalValue != null)
+                                console.log(value)
+                                if (boolean) {
+                                    return new Promise((resolve, reject) => {
+                                        axios.get(`http://localhost:8003/api/u/user/${value}/available`)
+                                            .then((res) => {
+                                                resolve(true);
+                                            })
+                                            .catch((error) => {
+                                                if (error.response.data.content === "The email has already been taken.") {
+                                                    resolve(false);
+                                                }
+                                            })
+                                    })
+                                }
+                            },
+                        }),
+                    acceptedTerms: Yup.boolean()
+                        .required('Required')
+                        .oneOf([true], 'You must accept the terms and conditions.')
+                        .test({
+                            exclusive: false,
+                        }),
+                    jobType: Yup.string()
+                        .oneOf(
+                            ['designer', 'development', 'product', 'other'],
+                            'Invalid Job Type'
+                        )
+                        .required('Required')
+                        .test({
+                            exclusive: true,
+                        }),
+                })}
+                onSubmit={(values, { setSubmitting }) => {
+                    setTimeout(() => {
+                        alert(JSON.stringify(values, null, 2));
+                        setSubmitting(false);
+                    }, 400);
+                }}
+            >
+                <Form>
+                    <MyTextInput
+                        label="First Name"
+                        name="firstName"
+                        type="text"
+                        placeholder="Jane"
+                        onChange={Formik.handleChange}
+                        onBlur={Formik.handleBlur}
+                    />
+
+                    <MyTextInput
+                        label="Last Name"
+                        name="lastName"
+                        type="text"
+                        placeholder="Doe"
+                    />
+
+                    <MyTextInput
+                        label="Email Address"
+                        name="email"
+                        type="email"
+                        placeholder="jane@formik.com"
+                    />
+
+                    <MySelect label="Job Type" name="jobType">
+                        <option value="">Select a job type</option>
+                        <option value="designer">Designer</option>
+                        <option value="development">Developer</option>
+                        <option value="product">Product Manager</option>
+                        <option value="other">Other</option>
+                    </MySelect>
+
+                    <MyCheckbox name="acceptedTerms">
+                        I accept the terms and conditions
+                    </MyCheckbox>
+
+                    <button type="submit">Submit</button>
+                </Form>
+            </Formik>
+        </>
     );
 };
 
